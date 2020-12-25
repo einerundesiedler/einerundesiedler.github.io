@@ -12,9 +12,28 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/25/2020, 14:08:45";</script>
+<script>VERSION="12/25/2020, 14:41:55";</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
+<script>
+
+</script>
+<script>
+class CardDeck {
+    constructor() {
+        this.cards = [];
+    }
+
+    shuffle() {
+        
+    }
+}
+
+
+function CreateDeckFromJSON(json) {
+    console.log(json.cards);
+}
+</script>
 <script>
 var config = {
     type: Phaser.AUTO,
@@ -34,12 +53,16 @@ var game = new Phaser.Game(config);
 function preload ()
 {
     asset_path = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/";
+
+    this.load.json('cardlist', asset_path+'cardlist.json');
+
     this.load.image('cards_knight_01', asset_path+'cards/knight_01.PNG');
-    console.log(window.screen.width);
 }
+
+
 function create ()
 {
-    console.log(this);
+    CreateDeckFromJSON(this.cache.json.get('cardlist'));
 
     scoreText = this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
 
