@@ -24,10 +24,11 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
+    this.load.image('cards_knight_01', 'assets/cards/knight_01.png');
 }
-
 function create ()
 {
+    this.add.image(200, 200, 'cards_knight_01');
 }
 
 function update ()
