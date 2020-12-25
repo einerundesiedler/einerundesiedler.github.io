@@ -5,8 +5,9 @@
     
 </style>
 </head>
-<script>RELEASE=true;</script>
 <body>
+<script>RELEASE=true;</script>
+	<script>RELEASE=false;</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
 <script>
@@ -25,7 +26,7 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    asset_path = !RELEASE ? "assets/" : "https://github.com/einerundesiedler/einerundesiedler.github.io/tree/master/assets/";
+    asset_path = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/";
 
     this.load.image('cards_knight_01', asset_path+'cards/knight_01.png');
 }
