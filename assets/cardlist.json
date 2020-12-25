@@ -1,5 +1,50 @@
 {
     "cards": [ 
+
+        { "id":"env_sheep_red", "type":"RED", "src":"sheep.png"},
+        { "id":"env_sheep_black", "type":"BLACK", "src":"sheep.png"},
+        { "id":"env_sheep_1", "type":"ENVIRONMENT", "src":"sheep.png"},
+        { "id":"env_sheep_2", "type":"ENVIRONMENT", "src":"sheep.png"},
+        
+        { "id":"env_coal_red", "type":"RED", "src":"coal.png"},
+        { "id":"env_coal_black", "type":"BLACK", "src":"coal.png"},
+        { "id":"env_coal_1", "type":"ENVIRONMENT", "src":"coal.png"},
+        { "id":"env_coal_2", "type":"ENVIRONMENT", "src":"coal.png"},
+
+        { "id":"env_wood_red", "type":"RED", "src":"wood.png"},
+        { "id":"env_wood_black", "type":"BLACK", "src":"wood.png"},
+        { "id":"env_wood_1", "type":"ENVIRONMENT", "src":"wood.png"},
+        { "id":"env_wood_2", "type":"ENVIRONMENT", "src":"wood.png"},
+
+        { "id":"env_wheat_red", "type":"RED", "src":"wheat.png"},
+        { "id":"env_wheat_black", "type":"BLACK", "src":"wheat.png"},
+        { "id":"env_wheat_1", "type":"ENVIRONMENT", "src":"wheat.png"},
+        { "id":"env_wheat_2", "type":"ENVIRONMENT", "src":"wheat.png"},
+
+        { "id":"env_mud_red", "type":"RED", "src":"mud.png"},
+        { "id":"env_mud_black", "type":"BLACK", "src":"mud.png"},
+        { "id":"env_mud_1", "type":"ENVIRONMENT", "src":"mud.png"},
+        { "id":"env_mud_2", "type":"ENVIRONMENT", "src":"mud.png"},
+        
+        { "id":"env_gold_red", "type":"RED", "src":"gold.png"},
+        { "id":"env_gold_black", "type":"BLACK", "src":"gold.png"},
+        { "id":"env_gold_1", "type":"ENVIRONMENT", "src":"gold.png"},
+
+
+        { "id":"road_red", "type":"RED", "src":"road.png"},
+        { "id":"road_black", "type":"BLACK", "src":"road.png"},
+        { "id":"road_1", "type":"ROAD", "src":"road.png"},
+        { "id":"road_2", "type":"ROAD", "src":"road.png"},
+        { "id":"road_3", "type":"ROAD", "src":"road.png"},
+        { "id":"road_4", "type":"ROAD", "src":"road.png"},
+        { "id":"road_5", "type":"ROAD", "src":"road.png"},
+        { "id":"road_6", "type":"ROAD", "src":"road.png"},
+        { "id":"road_7", "type":"ROAD", "src":"road.png"},
+
+        { "id":"village_red_1", "type":"RED", "src":"village.png"},
+        { "id":"village_red_2", "type":"RED", "src":"village.png"},
+        { "id":"village_black_1", "type":"BLACK", "src":"village.png"},
+        { "id":"village_black_2", "type":"BLACK", "src":"village.png"},
         { "id":"village_1", "type":"VILLAGE", "src":"village.png"},
         { "id":"village_2", "type":"VILLAGE", "src":"village.png"},
         { "id":"village_3", "type":"VILLAGE", "src":"village.png"},
