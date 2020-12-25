@@ -12,26 +12,71 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/25/2020, 14:47:55";</script>
+<script>VERSION="12/25/2020, 15:32:19";</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
+<script>
+function shuffle_array(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (0 !== currentIndex) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+  
+      // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+  
+    return array;
+  }
+</script>
 <script>
 
 </script>
 <script>
 class CardDeck {
-    constructor() {
-        this.cards = [];
+    constructor(card_data)  {
+        this.cards = card_data;
+        this.shuffle();
     }
 
-    shuffle() {
-        
+    get num_cards() {
+        return this.cards.length;
+    }
+
+    add_card(data) {
+        this.cards.push(data);
+    }
+
+    remove_card(id) {
+        this.cards = this.cards.filter(card => card.id != id);
+    }
+
+    shuffle() {   
+        this.cards = shuffle_array(this.cards);
+    }
+
+    draw_card() {
+        return this.cards.pop();
     }
 }
 
 
-function CreateDeckFromJSON(json) {
+function create_decks_from_json(json) {
+
+
+    var deck_villages = new CardDeck(json.cards.filter(card => card.type == "VILLAGE"));
+    var deck_cities = new CardDeck(json.cards.filter(card => card.type == "VILLAGE"));
+
     console.log(json.cards);
+    console.log(deck_villages.num_cards);
+    console.log(deck_villages.draw_card());
+    console.log(deck_villages.num_cards);
 }
 </script>
 <script>
@@ -62,7 +107,7 @@ function preload ()
 
 function create ()
 {
-    CreateDeckFromJSON(this.cache.json.get('cardlist'));
+    create_decks_from_json(this.cache.json.get('cardlist'));
 
     scoreText = this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
 

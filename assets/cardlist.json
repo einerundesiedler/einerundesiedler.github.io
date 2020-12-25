@@ -1,5 +1,20 @@
 {
     "cards": [ 
-        { "id":"village_%d", "copies":7, "src":"village.png" }
+        { "id":"village_1", "type":"VILLAGE", "src":"village.png"},
+        { "id":"village_2", "type":"VILLAGE", "src":"village.png"},
+        { "id":"village_3", "type":"VILLAGE", "src":"village.png"},
+        { "id":"village_4", "type":"VILLAGE", "src":"village.png"},
+        { "id":"village_5", "type":"VILLAGE", "src":"village.png"},
+
+        
+        { "id":"city_1", "type":"CITY", "src":"city.png"},
+        { "id":"city_2", "type":"CITY", "src":"city.png"},
+        { "id":"city_3", "type":"CITY", "src":"city.png"},
+        { "id":"city_4", "type":"CITY", "src":"city.png"},
+        { "id":"city_5", "type":"CITY", "src":"city.png"},
+        { "id":"city_6", "type":"CITY", "src":"city.png"},
+        { "id":"city_7", "type":"CITY", "src":"city.png"},
+
+        { "id":"knight_01", "type":"EXTENSION",  "src":"village.png" }
     ]
 }
