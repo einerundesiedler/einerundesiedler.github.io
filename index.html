@@ -25,14 +25,9 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    console.log(RELEASE);
-    if (RELEASE) {
-        console.log("we are releasing boys");
-    } else {
-        console.log("happy homebrew");
-    }
+    asset_path = !RELEASE ? "assets/" : "https://github.com/einerundesiedler/einerundesiedler.github.io/tree/master/assets/";
 
-    this.load.image('cards_knight_01', 'assets/cards/knight_01.png');
+    this.load.image('cards_knight_01', asset_path+'assets/cards/knight_01.png');
 }
 function create ()
 {
