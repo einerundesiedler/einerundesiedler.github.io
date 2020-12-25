@@ -3,22 +3,29 @@
 <head>
 <style>
     
+	body {	
+		margin: 0;
+		padding: 0;
+		background-color: #f1f1f1;
+	}
 </style>
 </head>
 <body>
-<p>version: 12/25/2020, 04:42:00</p>
 <script>RELEASE=true;</script>
+<script>VERSION="12/25/2020, 14:08:45";</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
 <script>
 var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 1920,
+    height: 1080,
+    backgroundColor: "#ffb",
     scene: {
         preload: preload,
         create: create,
-        update: update
+        update: update,
+        render: render
     }
 };
 
@@ -27,18 +34,55 @@ var game = new Phaser.Game(config);
 function preload ()
 {
     asset_path = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/";
-
-    console.log(asset_path + 'cards/knight_01.png');
-
     this.load.image('cards_knight_01', asset_path+'cards/knight_01.PNG');
+    console.log(window.screen.width);
 }
 function create ()
 {
-    this.add.image(200, 200, 'cards_knight_01');
+    console.log(this);
+
+    scoreText = this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
+
+    var image = this.add.image(200, 200, 'cards_knight_01').setInteractive();
+    image.setScale(0.5);
+
+
+    this.input.setDraggable(image);
+
+    //  The pointer has to move 16 pixels before it's considered as a drag
+    this.input.dragDistanceThreshold = 16;
+
+    this.input.on('dragstart', function (pointer, gameObject) {
+
+        gameObject.setTint(0xff0000);
+
+    });
+
+    this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+
+        gameObject.x = dragX;
+        gameObject.y = dragY;
+
+    });
+
+    this.input.on('dragend', function (pointer, gameObject) {
+
+        gameObject.clearTint();
+
+    });
+
 }
 
 function update ()
 {
+}
+
+
+function render () 
+{
+
+
+    this.debug.text("result", 10, 20);
 }
 </script>
 </body>
