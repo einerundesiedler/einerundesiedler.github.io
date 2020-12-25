@@ -1,0 +1,5 @@
+{
+    "cards": [ 
+        { "id":"village_%d", "copies":7, "src":"village.png" }
+    ]
+}
