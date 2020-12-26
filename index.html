@@ -12,7 +12,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/26/2020, 16:55:16";</script>
+<script>VERSION="12/26/2020, 17:16:42";</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
 <script>
@@ -48,7 +48,21 @@ function shuffle_array(array) {
 class CardDeck {
     constructor(card_data, card_back)  {
         this.cards = card_data;
+        this.card_back = card_back;
         this.shuffle();
+    }
+
+    add_to_scene(scene, x, y){
+        this.scene = scene;
+        this.obj = scene.add.image(x, y, this.card_back).setInteractive();
+
+        this.obj.setScale(0.5);
+        
+        this.obj.on('pointerup', this.onDeckClick);
+    }
+
+    onDeckClick(pointer) {
+        this.scene.main.onDeckClick(this);
     }
 
     get num_cards() {
@@ -72,9 +86,12 @@ class CardDeck {
     }
 }
 
-
+// call during scene.preload()
+// loads all card images from json asset list
 function load_card_images(scene, json) {
     var urls = json.cards.map(card => card.src).filter(array_remove_duplicates);
+    urls = json.card_backs.concat(urls);
+
     urls.forEach(url => {
         scene.load.image(url, ASSET_PATH + "cards/" + url);
     });
@@ -85,6 +102,8 @@ function create_decks_from_json(scene, json) {
     var card_data = json.cards;
 
     var deck_villages = new CardDeck(card_data.filter(card => card.type == "VILLAGE"), "back_village.png");
+    deck_villages.add_to_scene(scene, 100, 500);
+
     var deck_cities = new CardDeck(card_data.filter(card => card.type == "CITY"), "back_city.png");
 }
 </script>
@@ -124,6 +143,8 @@ function onLoaded(scene, fileObj) {
 
 function create ()
 {
+    this.main = new GameLoop(this);
+    
 
     create_decks_from_json(this, this.cache.json.get('cardlist'));
 
@@ -172,6 +193,19 @@ function render ()
 
 
     this.debug.text("result", 10, 20);
+}
+
+
+
+
+class GameLoop {
+    constructor(scene)  {
+        this.scene = scene;
+    }
+
+    onDeckClick(deck) {
+        console.log("deck clicked -> add card to player");
+    }
 }
 </script>
 </body>

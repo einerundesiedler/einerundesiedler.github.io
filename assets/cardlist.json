@@ -1,4 +1,13 @@
 {
+    "card_backs": [
+        "back_city.png",
+        "back_environment.png",
+        "back_event.png",
+        "back_extension.png",
+        "back_road.png",
+        "back_village.png" 
+    ], 
+
     "cards": [ 
 
         { "id":"env_sheep_red", "type":"RED", "src":"wool.png"},
