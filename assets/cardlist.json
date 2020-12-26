@@ -1,10 +1,10 @@
 {
     "cards": [ 
 
-        { "id":"env_sheep_red", "type":"RED", "src":"sheep.png"},
-        { "id":"env_sheep_black", "type":"BLACK", "src":"sheep.png"},
-        { "id":"env_sheep_1", "type":"ENVIRONMENT", "src":"sheep.png"},
-        { "id":"env_sheep_2", "type":"ENVIRONMENT", "src":"sheep.png"},
+        { "id":"env_sheep_red", "type":"RED", "src":"wool.png"},
+        { "id":"env_sheep_black", "type":"BLACK", "src":"wool.png"},
+        { "id":"env_sheep_1", "type":"ENVIRONMENT", "src":"wool.png"},
+        { "id":"env_sheep_2", "type":"ENVIRONMENT", "src":"wool.png"},
         
         { "id":"env_coal_red", "type":"RED", "src":"coal.png"},
         { "id":"env_coal_black", "type":"BLACK", "src":"coal.png"},
@@ -60,6 +60,6 @@
         { "id":"city_6", "type":"CITY", "src":"city.png"},
         { "id":"city_7", "type":"CITY", "src":"city.png"},
 
-        { "id":"knight_01", "type":"EXTENSION",  "src":"village.png" }
+        { "id":"knight_01", "type":"EXTENSION",  "src":"city.png" }
     ]
 }

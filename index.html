@@ -12,10 +12,14 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/25/2020, 15:38:55";</script>
+<script>VERSION="12/26/2020, 16:55:16";</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
 <script>
+function array_remove_duplicates(value, index, self) {
+  return self.indexOf(value) === index;
+}
+
 function shuffle_array(array) {
     var currentIndex = array.length, temporaryValue, randomIndex;
   
@@ -39,8 +43,10 @@ function shuffle_array(array) {
 
 </script>
 <script>
+
+
 class CardDeck {
-    constructor(card_data)  {
+    constructor(card_data, card_back)  {
         this.cards = card_data;
         this.shuffle();
     }
@@ -67,19 +73,24 @@ class CardDeck {
 }
 
 
-function create_decks_from_json(json) {
+function load_card_images(scene, json) {
+    var urls = json.cards.map(card => card.src).filter(array_remove_duplicates);
+    urls.forEach(url => {
+        scene.load.image(url, ASSET_PATH + "cards/" + url);
+    });
 
+}
 
-    var deck_villages = new CardDeck(json.cards.filter(card => card.type == "VILLAGE"));
-    var deck_cities = new CardDeck(json.cards.filter(card => card.type == "VILLAGE"));
+function create_decks_from_json(scene, json) {
+    var card_data = json.cards;
 
-    console.log(json.cards);
-    console.log(deck_villages.num_cards);
-    console.log(deck_villages.draw_card());
-    console.log(deck_villages.num_cards);
+    var deck_villages = new CardDeck(card_data.filter(card => card.type == "VILLAGE"), "back_village.png");
+    var deck_cities = new CardDeck(card_data.filter(card => card.type == "CITY"), "back_city.png");
 }
 </script>
 <script>
+ASSET_PATH = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/";
+
 var config = {
     type: Phaser.AUTO,
     width: 1920,
@@ -97,21 +108,31 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
-    asset_path = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/";
+    this.load.once('load', (fileObj) => onLoaded(this, fileObj));
+    this.load.json('cardlist', ASSET_PATH+'cardlist.json');
+}
 
-    this.load.json('cardlist', asset_path+'cardlist.json');
-
-    this.load.image('card_village', asset_path+'cards/village.png');
+function onLoaded(scene, fileObj) {
+    
+    switch(fileObj.key) {
+        case "cardlist":
+            load_card_images(scene, JSON.parse(fileObj.xhrLoader.response));
+            break;
+    } 
 }
 
 
 function create ()
 {
-    create_decks_from_json(this.cache.json.get('cardlist'));
+
+    create_decks_from_json(this, this.cache.json.get('cardlist'));
+
+    // --------------- SANDBOX
+
 
     scoreText = this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
 
-    var image = this.add.image(200, 200, 'card_village').setInteractive();
+    var image = this.add.image(500, 200, 'village.png').setInteractive();
     image.setScale(0.5);
 
 
