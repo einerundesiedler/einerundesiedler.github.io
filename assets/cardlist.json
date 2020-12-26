@@ -69,6 +69,17 @@
         { "id":"city_6", "type":"CITY", "src":"city.png"},
         { "id":"city_7", "type":"CITY", "src":"city.png"},
 
-        { "id":"knight_01", "type":"EXTENSION",  "src":"city.png" }
+        { "id":"event_1", "type":"EVENT",  "src":"city.png" },
+
+
+        { "id":"knight_1", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_2", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_3", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_4", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_5", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_6", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_7", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_8", "type":"EXTENSION",  "src":"city.png" },
+        { "id":"knight_9", "type":"EXTENSION",  "src":"city.png" }
     ]
 }

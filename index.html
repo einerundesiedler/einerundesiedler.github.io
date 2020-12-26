@@ -12,7 +12,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/26/2020, 17:16:42";</script>
+<script>VERSION="12/26/2020, 19:43:07";</script>
 	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
 <script>
@@ -40,31 +40,105 @@ function shuffle_array(array) {
   }
 </script>
 <script>
+class Button {
+    constructor(scene, x, y, text, onClick) {
 
+        this.bg = scene.add.image(x, y, 'button').setInteractive();
+        this.bg.on('pointerup', onClick);
+
+        this.textfield = scene.add.text(x-60, y, text, { fontSize: '24px', fill: '#000' });
+    }
+
+    set text(val) {
+        this.textfield.text = val;
+    }
+}
+</script>
+<script>
+class Card{
+    constructor(scene, card_data) {
+        this.id = card_data.id;
+        this.image = scene.add.image(100, 100, card_data.src).setInteractive();
+        this.image.setScale(0.5);
+        
+        scene.input.setDraggable(this.image);
+        scene.input.on('drag',  (pointer, gameObject, dragX, dragY) => { this.onDrag(this, dragX, dragY); });
+        scene.input.on('dragend', () => { this.onDragEnd(this); });
+    }
+
+    moveTo(x, y, sync) {
+        this.image.x = x;
+        this.image.y = y;
+
+        if (sync == true) {
+            this.sync();
+        }
+    }
+
+    onDrag(card, dragX, dragY) {
+        card.moveTo(dragX, dragY);
+    }
+
+    onDragEnd() {
+        this.sync();
+    }
+
+    sync() {
+        console.log("TODO: trigger sync card " + this.id + " event");
+    }
+}
 </script>
 <script>
 
 
 class CardDeck {
-    constructor(card_data, card_back)  {
-        this.cards = card_data;
+    constructor(card_back)  {
+        this.cards = [];
         this.card_back = card_back;
+        this.hover = false;
+    }
+
+    set_cards(cards) {
+        this.cards = cards;
         this.shuffle();
     }
 
-    add_to_scene(scene, x, y){
+    add_to_scene(scene, x, y) {
         this.scene = scene;
         this.obj = scene.add.image(x, y, this.card_back).setInteractive();
+        this.textfield = scene.add.text(x-60, y-10, "", { fontSize: '22px', fill: '#fff' });
 
         this.obj.setScale(0.5);
         
-        this.obj.on('pointerup', this.onDeckClick);
+        this.obj.on('pointerup', () => this.onDeckClick(this)); 
+        this.obj.on('pointerover', () => this.onPointerOver(this)); 
+        this.obj.on('pointerout', () => this.onPointerOut(this)); 
     }
 
-    onDeckClick(pointer) {
-        this.scene.main.onDeckClick(this);
+    onDeckClick() {
+        this.scene.main.onDeckClick(this);  
     }
 
+    onPointerOver() {
+        this.hover = true;
+        this.update();
+    }
+
+    onPointerOut() {
+        this.hover = false;
+        this.update();
+    }
+
+    update() {
+        if (this.hover) {
+            this.obj.setTint(0x555555);
+        } else {
+            this.obj.clearTint();
+        }
+
+        this.textfield.text = this.hover ? this.num_cards + " Karten" : "";
+    }
+    
     get num_cards() {
         return this.cards.length;
     }
@@ -82,7 +156,9 @@ class CardDeck {
     }
 
     draw_card() {
-        return this.cards.pop();
+        var card = this.cards.pop();
+        this.update();
+        return card;
     }
 }
 
@@ -98,13 +174,57 @@ function load_card_images(scene, json) {
 
 }
 
-function create_decks_from_json(scene, json) {
+function create_decks(scene) {
+    var y_start = 450;
+
+    scene.main.decks = {};
+    scene.main.decks.events = new CardDeck("back_event.png");
+    scene.main.decks.events.add_to_scene(scene, 100, y_start);
+    
+    scene.main.decks.cities = new CardDeck("back_city.png");
+    scene.main.decks.cities.add_to_scene(scene, 250, y_start);
+    
+    scene.main.decks.roads = new CardDeck("back_road.png");
+    scene.main.decks.roads.add_to_scene(scene, 400, y_start);
+
+    scene.main.decks.villages = new CardDeck("back_village.png");
+    scene.main.decks.villages.add_to_scene(scene, 550, y_start);
+
+    scene.main.decks.environments = new CardDeck("back_environment.png");
+    scene.main.decks.environments.add_to_scene(scene, 700, y_start);
+    
+    scene.main.decks.extensions = [];
+
+    for(var i = 0; i < 5; i++) {
+        scene.main.decks.extensions.push(new CardDeck("back_extension.png"));
+        scene.main.decks.extensions[i].add_to_scene(scene, 850 + i * 150, y_start );
+    }
+}
+
+function init_decks_from_cardlist(scene, json) {
     var card_data = json.cards;
 
-    var deck_villages = new CardDeck(card_data.filter(card => card.type == "VILLAGE"), "back_village.png");
-    deck_villages.add_to_scene(scene, 100, 500);
+    
 
-    var deck_cities = new CardDeck(card_data.filter(card => card.type == "CITY"), "back_city.png");
+    for (var i = 0; i < card_data.length; i++) {
+        card_data[i].x = -200;
+        card_data[i].y = -200;
+    }
+
+    scene.main.decks.events.set_cards(card_data.filter(card => card.type == "EVENT"));
+    scene.main.decks.cities.set_cards(card_data.filter(card => card.type == "CITY"));
+    scene.main.decks.roads.set_cards(card_data.filter(card => card.type == "ROAD"));
+    scene.main.decks.villages.set_cards(card_data.filter(card => card.type == "VILLAGE"));
+    scene.main.decks.environments.set_cards(card_data.filter(card => card.type == "ENVIRONMENT"));
+
+    var card_extensions = shuffle_array(card_data.filter(card => card.type == "EXTENSION"));
+    var num_cards = Math.ceil(card_extensions.length / 5);
+
+    for(var i = 0; i < 5; i++) {
+        var cards = card_extensions.slice(i*num_cards, Math.min((i+1)*num_cards, card_extensions.length));
+        scene.main.decks.extensions[i].set_cards(cards);
+    }
+
 }
 </script>
 <script>
@@ -129,6 +249,8 @@ function preload ()
 {
     this.load.once('load', (fileObj) => onLoaded(this, fileObj));
     this.load.json('cardlist', ASSET_PATH+'cardlist.json');
+
+    this.load.image('button', ASSET_PATH+"ui/button.png");
 }
 
 function onLoaded(scene, fileObj) {
@@ -143,43 +265,30 @@ function onLoaded(scene, fileObj) {
 
 function create ()
 {
-    this.main = new GameLoop(this);
-    
+    this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
 
-    create_decks_from_json(this, this.cache.json.get('cardlist'));
+    // ------------------- GAME LOOP ----------------
+    this.main = new GameLoop(this);
+    create_decks(this);
+    init_decks_from_cardlist(this, this.cache.json.get('cardlist'));
+
+
+    // ------------------- UI ----------------
+    this.ui = {};
+    this.ui.btn_newgame = new Button(this, 650, 20, "new game", this.main.onNewGameClick);
+    this.ui.btn_player = new Button(this, 800, 20, "join", this.main.onPlayerButtonClick);
 
     // --------------- SANDBOX
 
 
-    scoreText = this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
+    // indexing of object properties
+    var testobj = {};
+    testobj.test = "asd";
+    console.log(testobj["test"]);
 
-    var image = this.add.image(500, 200, 'village.png').setInteractive();
-    image.setScale(0.5);
 
-
-    this.input.setDraggable(image);
-
-    //  The pointer has to move 16 pixels before it's considered as a drag
-    this.input.dragDistanceThreshold = 16;
-
-    this.input.on('dragstart', function (pointer, gameObject) {
-
-        gameObject.setTint(0xff0000);
-
-    });
-
-    this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-
-    });
-
-    this.input.on('dragend', function (pointer, gameObject) {
-
-        gameObject.clearTint();
-
-    });
+    var card_test = new Card(this, this.cache.json.get('cardlist').cards[50]);
+    card_test.moveTo(200, 200);
 
 }
 
@@ -191,8 +300,6 @@ function update ()
 function render () 
 {
 
-
-    this.debug.text("result", 10, 20);
 }
 
 
@@ -201,10 +308,32 @@ function render ()
 class GameLoop {
     constructor(scene)  {
         this.scene = scene;
+        this.playerID = 0;
+    }
+
+    onNewGameClick() {
+        console.log("TODO: new game");
+    }
+
+    onPlayerButtonClick() {
+        this.playerID = this.playerID == 1 ? 2 : 1;
+        this.scene.ui.btn_player.text = "player: " + this.playerID;
     }
 
     onDeckClick(deck) {
         console.log("deck clicked -> add card to player");
+        deck.draw_card();
+    }
+}
+
+class GameState {
+    constructor() {
+        this.player1 = [];
+        this.player2 = [];
+
+        this.events = [];
+        this.cities = [];
+
     }
 }
 </script>
