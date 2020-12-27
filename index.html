@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/27/2020, 19:53:18";</script>
+<script>VERSION="12/28/2020, 00:07:35";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -61,6 +61,7 @@ class DB {
 
         // get realtime database references
         this.refCards = firebase.database().ref().child('cards');
+        this.refDecks = firebase.database().ref().child('decks');
 
     }    
 
@@ -93,8 +94,19 @@ class DB {
         });
     }
 
-    link_decks(gameloop) {
-        console.log(gameloop.decks);
+    
+    // upload new card position to database
+    set_deck_data(deck_index, cards) {
+        this.refDecks.child(String(deck_index)).set(cards);
+    }
+
+    link_decks(gameLoop) {
+        gameLoop.decks.forEach(deck => {
+            this.refDecks.child(String(deck.index)).on('value', (snapshot) => {
+                var cards = snapshot.val();
+                gameLoop.decks[deck.index].set_cards(cards);
+            });
+        });
     }
 
 }
@@ -144,7 +156,6 @@ class Card{
             scene.input.on('drag',  (pointer, gameObject, dragX, dragY) => { gameObject.view.onDrag(dragX, dragY); });
             scene.input.on('dragend', (pointer, gameObject) => { gameObject.view.onDragEnd(); });
         }
-
     }
 
     moveTo(x, y, sync) {
@@ -174,7 +185,6 @@ class Card{
 }
 
 
-
 // creates card views and stores it in gameloop.cards
 // links position to database
 function create_cards_from_json(scene, json) {
@@ -194,7 +204,8 @@ function create_cards_from_json(scene, json) {
 
 
 class CardDeck {
-    constructor(scene, card_type, x, y)  {
+    constructor(scene, index, card_type, x, y)  {
+        this.index = index;
         this.cards = [];
         this.card_type = card_type;
         this.add_to_scene(scene, x, y);
@@ -225,18 +236,9 @@ class CardDeck {
 
         this.obj.setScale(0.5);
         
-        this.obj.on('pointerup', () => this.onDeckClick(this)); 
-        this.obj.on('pointerover', () => this.onPointerOver(this)); 
-        this.obj.on('pointerout', () => this.onPointerOut(this)); 
-    }
-
-    set_cards(cards) {
-        this.cards = cards;
-        this.shuffle();
-    }
-
-    onDeckClick() {
-        this.scene.main.onDeckClick(this);  
+        this.obj.on('pointerup', () => this.scene.main.onDeckClick(this)); 
+        this.obj.on('pointerover', () => this.onPointerOver()); 
+        this.obj.on('pointerout', () => this.onPointerOut()); 
     }
 
     onPointerOver() {
@@ -260,25 +262,43 @@ class CardDeck {
     }
     
     get num_cards() {
-        return this.cards.length;
+        return this.cards == undefined ? 0 : this.cards.length;
+    }
+
+
+    // set either by array of cards or card_indices
+    set_cards(cards, sync) {
+        this.cards = cards.index == undefined ? cards : cards.map(card => card.index);
+
+        if (sync == true) {
+            this.sync();
+        }
     }
 
     add_card(data) {
         this.cards.push(data);
+        this.sync();
     }
 
     remove_card(id) {
         this.cards = this.cards.filter(card => card.id != id);
+        this.sync();
     }
 
     shuffle() {   
         this.cards = shuffle_array(this.cards);
+        this.sync();
     }
 
     draw_card() {
         var card = this.cards.pop();
         this.update();
+        this.sync();
         return card;
+    }
+
+    sync() {
+        this.scene.db.set_deck_data(this.index, this.cards);
     }
 }
 
@@ -297,32 +317,32 @@ function load_card_images(scene, json) {
 function create_decks(scene) {
     var y_start = 450;
 
-    scene.main.decks.push(new CardDeck(scene, "EVENT", 100, y_start));
-    scene.main.decks.push(new CardDeck(scene, "CITY", 250, y_start));
-    scene.main.decks.push(new CardDeck(scene, "ROAD", 400, y_start));
-    scene.main.decks.push(new CardDeck(scene, "VILLAGE", 550, y_start));
-    scene.main.decks.push(new CardDeck(scene, "ENVIRONMENT", 700, y_start));
+    scene.main.decks.push(new CardDeck(scene, 0, "EVENT", 100, y_start));
+    scene.main.decks.push(new CardDeck(scene, 1, "CITY", 250, y_start));
+    scene.main.decks.push(new CardDeck(scene, 2, "ROAD", 400, y_start));
+    scene.main.decks.push(new CardDeck(scene, 3, "VILLAGE", 550, y_start));
+    scene.main.decks.push(new CardDeck(scene, 4, "ENVIRONMENT", 700, y_start));
 
     for(var i = 0; i < 5; i++) {
-        scene.main.decks.push(new CardDeck(scene, "EXTENSION", 850 + i * 150, y_start));
+        scene.main.decks.push(new CardDeck(scene, 5+i, "EXTENSION", 850 + i * 150, y_start));
     }
+    
+    scene.db.link_decks(scene.main);
 }
 
-function init_decks(gameLoop) {
-    var cards = gameLoop.cards;
+function reset_decks(decks, cards) {
+    decks[0].set_cards(cards.filter(card => card.data.type == "EVENT"), true);
+    decks[1].set_cards(cards.filter(card => card.data.type == "CITY"), true);
+    decks[2].set_cards(cards.filter(card => card.data.type == "ROAD"), true);
+    decks[3].set_cards(cards.filter(card => card.data.type == "VILLAGE"), true);
+    decks[4].set_cards(cards.filter(card => card.data.type == "ENVIRONMENT"), true);
 
-    gameLoop.decks[0].set_cards(cards.filter(card => card.data.type == "EVENT"));
-    gameLoop.decks[1].set_cards(cards.filter(card => card.data.type == "CITY"));
-    gameLoop.decks[2].set_cards(cards.filter(card => card.data.type == "ROAD"));
-    gameLoop.decks[3].set_cards(cards.filter(card => card.data.type == "VILLAGE"));
-    gameLoop.decks[4].set_cards(cards.filter(card => card.data.type == "ENVIRONMENT"));
-
-    var card_extensions = shuffle_array(cards.filter(card => card.data.type == "EXTENSION"));
+    var card_extensions = shuffle_array(cards.filter(card => card.data.type == "EXTENSION"), true);
     var num_cards = Math.ceil(card_extensions.length / 5);
 
     for(var i = 0; i < 5; i++) {
         var cards = card_extensions.slice(i*num_cards, Math.min((i+1)*num_cards, card_extensions.length));
-        gameLoop.decks[5+i].set_cards(cards);
+        decks[5+i].set_cards(cards, true);
     }
 
 }
@@ -415,9 +435,7 @@ class GameLoop {
         console.log("TODO: new game");
 
         // create card data from 
-        init_decks(this);
-        this.scene.db.link_decks(this);
-
+        reset_decks(this.decks, this.cards);
         this.scene.db.reset_card_positions(this.cards);
 
         // --- RED SETUP
