@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 00:07:35";</script>
+<script>VERSION="12/28/2020, 00:18:32";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -267,12 +267,11 @@ class CardDeck {
 
 
     // set either by array of cards or card_indices
-    set_cards(cards, sync) {
-        this.cards = cards.index == undefined ? cards : cards.map(card => card.index);
+    set_cards(cards) {
+        if (cards == null || cards.length == 0) { return }
 
-        if (sync == true) {
-            this.sync();
-        }
+        this.cards = cards[0].index == undefined ? cards : cards.map(card => card.index);
+        this.update();
     }
 
     add_card(data) {
@@ -331,20 +330,21 @@ function create_decks(scene) {
 }
 
 function reset_decks(decks, cards) {
-    decks[0].set_cards(cards.filter(card => card.data.type == "EVENT"), true);
-    decks[1].set_cards(cards.filter(card => card.data.type == "CITY"), true);
-    decks[2].set_cards(cards.filter(card => card.data.type == "ROAD"), true);
-    decks[3].set_cards(cards.filter(card => card.data.type == "VILLAGE"), true);
-    decks[4].set_cards(cards.filter(card => card.data.type == "ENVIRONMENT"), true);
+    decks[0].set_cards(cards.filter(card => card.data.type == "EVENT"));
+    decks[1].set_cards(cards.filter(card => card.data.type == "CITY"));
+    decks[2].set_cards(cards.filter(card => card.data.type == "ROAD"));
+    decks[3].set_cards(cards.filter(card => card.data.type == "VILLAGE"));
+    decks[4].set_cards(cards.filter(card => card.data.type == "ENVIRONMENT"));
 
-    var card_extensions = shuffle_array(cards.filter(card => card.data.type == "EXTENSION"), true);
+    var card_extensions = shuffle_array(cards.filter(card => card.data.type == "EXTENSION"));
     var num_cards = Math.ceil(card_extensions.length / 5);
 
     for(var i = 0; i < 5; i++) {
         var cards = card_extensions.slice(i*num_cards, Math.min((i+1)*num_cards, card_extensions.length));
-        decks[5+i].set_cards(cards, true);
+        decks[5+i].set_cards(cards);
     }
 
+    decks.forEach(deck => deck.shuffle());
 }
 </script>
 <script>
@@ -432,8 +432,6 @@ class GameLoop {
     }
 
     onNewGameClick() {
-        console.log("TODO: new game");
-
         // create card data from 
         reset_decks(this.decks, this.cards);
         this.scene.db.reset_card_positions(this.cards);
