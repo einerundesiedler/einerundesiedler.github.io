@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 00:47:43";</script>
+<script>VERSION="12/28/2020, 00:51:27";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -521,7 +521,7 @@ class GameLoop {
 
         if (card_id != undefined) {
             var card = this.cards.filter(card => card.index == card_id)[0];
-            card.moveTo(100, 100);
+            card.moveTo(100, 100, true);
         }
     }
 
