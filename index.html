@@ -1,6 +1,10 @@
 <meta charset="UTF-8"> 
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
 <head>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+
 <style>
     
 	body {	
@@ -12,9 +16,8 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/26/2020, 19:43:07";</script>
-	<script src="https://cdn.jsdelivr.net/npm/phaser@3.50.0/dist/phaser.min.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase.js"></script>
+<script>VERSION="12/27/2020, 05:17:38";</script>
+
 <script>
 function array_remove_duplicates(value, index, self) {
   return self.indexOf(value) === index;
@@ -38,6 +41,39 @@ function shuffle_array(array) {
   
     return array;
   }
+</script>
+<script>
+class DB {
+    constructor() {
+        // firebase config 
+        var firebaseConfig = {
+            apiKey: "AIzaSyCsKZy0uardEJ9ptCUnWPiPBZPusp7aXy4",
+            authDomain: "einerundesiedler-50542.firebaseapp.com",
+            databaseURL: "https://einerundesiedler-50542-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "einerundesiedler-50542",
+            storageBucket: "einerundesiedler-50542.appspot.com",
+            messagingSenderId: "1037179221686",
+            appId: "1:1037179221686:web:1b86c4acf11eac025c1817"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    }    
+
+    test() {
+        console.log("establish connection ...");
+
+        var refObj = document.getElementById("testobject");
+
+        const starCountRef = firebase.database().ref().child('testobject');
+        starCountRef.on('value', (snapshot) => {
+          const data = snapshot.val();
+          console.log(data);
+        });
+    }
+}
+
+
 </script>
 <script>
 class Button {
@@ -247,6 +283,8 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
+    this.db = new DB();
+
     this.load.once('load', (fileObj) => onLoaded(this, fileObj));
     this.load.json('cardlist', ASSET_PATH+'cardlist.json');
 
@@ -318,6 +356,7 @@ class GameLoop {
     onPlayerButtonClick() {
         this.playerID = this.playerID == 1 ? 2 : 1;
         this.scene.ui.btn_player.text = "player: " + this.playerID;
+        this.scene.db.test();
     }
 
     onDeckClick(deck) {
