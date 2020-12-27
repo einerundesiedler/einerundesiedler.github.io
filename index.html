@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/27/2020, 19:10:10";</script>
+<script>VERSION="12/27/2020, 19:21:17";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -299,21 +299,21 @@ function create_decks(scene) {
     }
 }
 
-function init_decks_from_cardlist(scene, json) {
-    var card_data = json.cards;
+function init_decks(gameLoop) {
+    var cards = gameLoop.cards;
 
-    scene.main.decks.events.set_cards(card_data.filter(card => card.type == "EVENT"));
-    scene.main.decks.cities.set_cards(card_data.filter(card => card.type == "CITY"));
-    scene.main.decks.roads.set_cards(card_data.filter(card => card.type == "ROAD"));
-    scene.main.decks.villages.set_cards(card_data.filter(card => card.type == "VILLAGE"));
-    scene.main.decks.environments.set_cards(card_data.filter(card => card.type == "ENVIRONMENT"));
+    gameLoop.decks.events.set_cards(cards.filter(card => card.data.type == "EVENT"));
+    gameLoop.decks.cities.set_cards(cards.filter(card => card.data.type == "CITY"));
+    gameLoop.decks.roads.set_cards(cards.filter(card => card.data.type == "ROAD"));
+    gameLoop.decks.villages.set_cards(cards.filter(card => card.data.type == "VILLAGE"));
+    gameLoop.decks.environments.set_cards(cards.filter(card => card.data.type == "ENVIRONMENT"));
 
-    var card_extensions = shuffle_array(card_data.filter(card => card.type == "EXTENSION"));
+    var card_extensions = shuffle_array(cards.filter(card => card.data.type == "EXTENSION"));
     var num_cards = Math.ceil(card_extensions.length / 5);
 
     for(var i = 0; i < 5; i++) {
         var cards = card_extensions.slice(i*num_cards, Math.min((i+1)*num_cards, card_extensions.length));
-        scene.main.decks.extensions[i].set_cards(cards);
+        gameLoop.decks.extensions[i].set_cards(cards);
     }
 
 }
@@ -362,15 +362,13 @@ function create ()
 
     // ------------------- GAME LOOP ----------------
     this.main = new GameLoop(this);
-
-    var cardlist_json = this.cache.json.get('cardlist');
-
-
-    create_decks(this);
-    //init_decks_from_cardlist(this, cardlist_json);
     
-    // creates cards and links to
-    create_cards_from_json(this, cardlist_json);
+    // creates cards and links to database
+    create_cards_from_json(this, this.cache.json.get('cardlist'));
+
+    // create empty decks and link to database
+    create_decks(this);
+    
 
 
 
@@ -406,6 +404,10 @@ class GameLoop {
 
     onNewGameClick() {
         console.log("TODO: new game");
+
+        // create card data from 
+        init_decks(this);
+
         this.scene.db.reset_card_positions(this.cards);
 
         // --- RED SETUP
