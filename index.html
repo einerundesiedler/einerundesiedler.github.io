@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/27/2020, 05:20:43";</script>
+<script>VERSION="12/27/2020, 18:32:14";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -59,12 +59,37 @@ class DB {
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        this.example_get_data();
+        // get realtime database references
+        this.refCards = firebase.database().ref().child('cards');
+
     }    
 
-    example_get_data() {
-        const testRef = firebase.database().ref().child('testobject');
-        testRef.on('value', (snapshot) => console.log(snapshot.val()));
+    // serialize card data with initial position
+    reset_card_positions(cards) {
+        var data = {};
+        for (var i = 0; i < cards.length; i++) {
+            data[String(i)] = {
+                x: -200,
+                y: -200
+            };
+        }
+        
+        // store in database
+        this.refCards.set(data);
+    }
+
+    link_card_positions(gameLoop) {
+        gameLoop.cards.forEach(card => {
+            this.refCards.child(String(card.index)).on('value', (snapshot) => {
+                var pos = snapshot.val();
+                gameLoop.cards[card.index].moveTo(pos.x, pos.y);
+            });
+        });
+
+    }
+
+    set_card_position(card_index, x, y) {
+        this.refCards.child(String(card_index)).set({x: x, y:y});
     }
 }
 
@@ -86,15 +111,31 @@ class Button {
 }
 </script>
 <script>
+
 class Card{
-    constructor(scene, card_data) {
-        this.id = card_data.id;
+    static hasDragListener = false;
+
+    constructor(scene, card_data, index) {
+        // short index for realtime database connection to save bandwidth 
+        this.index = index;
+        this.data = card_data;
+        this.scene = scene;
+
+        // ui components
         this.image = scene.add.image(100, 100, card_data.src).setInteractive();
         this.image.setScale(0.5);
-        
+
+        // parent view pointer for drag listener resolving 
+        this.image.view = this; 
+
+        // set drag listeners only once
         scene.input.setDraggable(this.image);
-        scene.input.on('drag',  (pointer, gameObject, dragX, dragY) => { this.onDrag(this, dragX, dragY); });
-        scene.input.on('dragend', () => { this.onDragEnd(this); });
+        if (!Card.hasDragListener) {
+            Card.hasDragListener = true;
+            scene.input.on('drag',  (pointer, gameObject, dragX, dragY) => { gameObject.view.onDrag(dragX, dragY); });
+            scene.input.on('dragend', (pointer, gameObject) => { gameObject.view.onDragEnd(); });
+        }
+
     }
 
     moveTo(x, y, sync) {
@@ -106,8 +147,8 @@ class Card{
         }
     }
 
-    onDrag(card, dragX, dragY) {
-        card.moveTo(dragX, dragY);
+    onDrag(dragX, dragY) {
+        this.moveTo(dragX, dragY);
     }
 
     onDragEnd() {
@@ -115,8 +156,26 @@ class Card{
     }
 
     sync() {
-        console.log("TODO: trigger sync card " + this.id + " event");
+        this.scene.db.set_card_position(this.index, this.image.x, this.image.y);
     }
+
+    onDBUpdate() {
+    }
+}
+
+
+function create_cards_from_json(scene, json) {
+    
+    for(var i = 0; i < json.cards.length; i++) {
+        var data = json.cards[i];
+        var card = new Card(scene, data, i);
+        card.moveTo(-200, -200);
+
+        scene.main.cards.push(card);
+
+    }
+
+    scene.db.link_card_positions(scene.main);
 }
 </script>
 <script>
@@ -207,6 +266,8 @@ function load_card_images(scene, json) {
 
 function create_decks(scene) {
     var y_start = 450;
+
+    scene.main.cards = [];
 
     scene.main.decks = {};
     scene.main.decks.events = new CardDeck("back_event.png");
@@ -302,14 +363,19 @@ function create ()
 
     // ------------------- GAME LOOP ----------------
     this.main = new GameLoop(this);
+    var cardlist_json = this.cache.json.get('cardlist');
+
     create_decks(this);
-    init_decks_from_cardlist(this, this.cache.json.get('cardlist'));
+
+    //init_decks_from_cardlist(this, cardlist_json);
+
+    create_cards_from_json(this, cardlist_json);
 
 
     // ------------------- UI ----------------
     this.ui = {};
-    this.ui.btn_newgame = new Button(this, 650, 20, "new game", this.main.onNewGameClick);
-    this.ui.btn_player = new Button(this, 800, 20, "join", this.main.onPlayerButtonClick);
+    this.ui.btn_newgame = new Button(this, 650, 20, "new game", () => this.main.onNewGameClick());
+    this.ui.btn_player = new Button(this, 800, 20, "join", () => this.main.onPlayerButtonClick());
 
     // --------------- SANDBOX
 
@@ -320,8 +386,7 @@ function create ()
     console.log(testobj["test"]);
 
 
-    var card_test = new Card(this, this.cache.json.get('cardlist').cards[50]);
-    card_test.moveTo(200, 200);
+    this.main.cards[50].moveTo(600, 200);
 
 }
 
@@ -342,10 +407,13 @@ class GameLoop {
     constructor(scene)  {
         this.scene = scene;
         this.playerID = 0;
+
+        this.cards = [];
     }
 
     onNewGameClick() {
         console.log("TODO: new game");
+        this.scene.db.reset_card_positions(this.cards);
     }
 
     onPlayerButtonClick() {
@@ -359,15 +427,5 @@ class GameLoop {
     }
 }
 
-class GameState {
-    constructor() {
-        this.player1 = [];
-        this.player2 = [];
-
-        this.events = [];
-        this.cities = [];
-
-    }
-}
 </script>
 </body>
