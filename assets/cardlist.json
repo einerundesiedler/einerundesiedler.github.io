@@ -30,10 +30,10 @@
         { "id":"env_wheat_1", "type":"ENVIRONMENT", "src":"wheat.png"},
         { "id":"env_wheat_2", "type":"ENVIRONMENT", "src":"wheat.png"},
 
-        { "id":"env_mud_red", "type":"RED", "src":"mud.png"},
-        { "id":"env_mud_black", "type":"BLACK", "src":"mud.png"},
-        { "id":"env_mud_1", "type":"ENVIRONMENT", "src":"mud.png"},
-        { "id":"env_mud_2", "type":"ENVIRONMENT", "src":"mud.png"},
+        { "id":"env_brick_red", "type":"RED", "src":"brick.png"},
+        { "id":"env_brick_black", "type":"BLACK", "src":"brick.png"},
+        { "id":"env_brick_1", "type":"ENVIRONMENT", "src":"brick.png"},
+        { "id":"env_brick_2", "type":"ENVIRONMENT", "src":"brick.png"},
         
         { "id":"env_gold_red", "type":"RED", "src":"gold.png"},
         { "id":"env_gold_black", "type":"BLACK", "src":"gold.png"},

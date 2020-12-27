@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/27/2020, 18:32:14";</script>
+<script>VERSION="12/27/2020, 19:10:10";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -69,28 +69,31 @@ class DB {
         var data = {};
         for (var i = 0; i < cards.length; i++) {
             data[String(i)] = {
-                x: -200,
-                y: -200
+                x: Card.start_x,
+                y: Card.start_y
             };
         }
         
-        // store in database
+        // upload to database
         this.refCards.set(data);
     }
+    
+    // upload new card position to database
+    set_card_position(card_index, x, y) {
+        this.refCards.child(String(card_index)).set({x: x, y:y});
+    }
 
+    // creates individual listener for each card position
     link_card_positions(gameLoop) {
         gameLoop.cards.forEach(card => {
             this.refCards.child(String(card.index)).on('value', (snapshot) => {
                 var pos = snapshot.val();
-                gameLoop.cards[card.index].moveTo(pos.x, pos.y);
+                gameLoop.cards[card.index].on_pos_update_in_database(pos.x, pos.y);
             });
         });
 
     }
 
-    set_card_position(card_index, x, y) {
-        this.refCards.child(String(card_index)).set({x: x, y:y});
-    }
 }
 
 
@@ -114,6 +117,9 @@ class Button {
 
 class Card{
     static hasDragListener = false;
+    static start_x = -200;
+    static start_y = -200;
+
 
     constructor(scene, card_data, index) {
         // short index for realtime database connection to save bandwidth 
@@ -122,8 +128,8 @@ class Card{
         this.scene = scene;
 
         // ui components
-        this.image = scene.add.image(100, 100, card_data.src).setInteractive();
-        this.image.setScale(0.5);
+        this.image = scene.add.image(Card.start_x, Card.start_y, card_data.src).setInteractive();
+        this.image.setScale(0.33);
 
         // parent view pointer for drag listener resolving 
         this.image.view = this; 
@@ -159,22 +165,25 @@ class Card{
         this.scene.db.set_card_position(this.index, this.image.x, this.image.y);
     }
 
-    onDBUpdate() {
+    on_pos_update_in_database(x, y) {
+        this.moveTo(x, y);
     }
 }
 
 
+
+// creates card views and stores it in gameloop.cards
+// links position to database
 function create_cards_from_json(scene, json) {
-    
     for(var i = 0; i < json.cards.length; i++) {
         var data = json.cards[i];
         var card = new Card(scene, data, i);
-        card.moveTo(-200, -200);
 
+        // store in gameloop
         scene.main.cards.push(card);
-
     }
 
+    // syncronize card position
     scene.db.link_card_positions(scene.main);
 }
 </script>
@@ -267,9 +276,6 @@ function load_card_images(scene, json) {
 function create_decks(scene) {
     var y_start = 450;
 
-    scene.main.cards = [];
-
-    scene.main.decks = {};
     scene.main.decks.events = new CardDeck("back_event.png");
     scene.main.decks.events.add_to_scene(scene, 100, y_start);
     
@@ -295,13 +301,6 @@ function create_decks(scene) {
 
 function init_decks_from_cardlist(scene, json) {
     var card_data = json.cards;
-
-    
-
-    for (var i = 0; i < card_data.length; i++) {
-        card_data[i].x = -200;
-        card_data[i].y = -200;
-    }
 
     scene.main.decks.events.set_cards(card_data.filter(card => card.type == "EVENT"));
     scene.main.decks.cities.set_cards(card_data.filter(card => card.type == "CITY"));
@@ -363,13 +362,16 @@ function create ()
 
     // ------------------- GAME LOOP ----------------
     this.main = new GameLoop(this);
+
     var cardlist_json = this.cache.json.get('cardlist');
 
+
     create_decks(this);
-
     //init_decks_from_cardlist(this, cardlist_json);
-
+    
+    // creates cards and links to
     create_cards_from_json(this, cardlist_json);
+
 
 
     // ------------------- UI ----------------
@@ -377,16 +379,6 @@ function create ()
     this.ui.btn_newgame = new Button(this, 650, 20, "new game", () => this.main.onNewGameClick());
     this.ui.btn_player = new Button(this, 800, 20, "join", () => this.main.onPlayerButtonClick());
 
-    // --------------- SANDBOX
-
-
-    // indexing of object properties
-    var testobj = {};
-    testobj.test = "asd";
-    console.log(testobj["test"]);
-
-
-    this.main.cards[50].moveTo(600, 200);
 
 }
 
@@ -409,11 +401,38 @@ class GameLoop {
         this.playerID = 0;
 
         this.cards = [];
+        this.decks = {};
     }
 
     onNewGameClick() {
         console.log("TODO: new game");
         this.scene.db.reset_card_positions(this.cards);
+
+        // --- RED SETUP
+        this.getCardById("env_coal_red").moveTo(500, 120, true);
+        this.getCardById("village_red_1").moveTo(600, 220, true);
+        this.getCardById("env_brick_red").moveTo(500, 320, true);
+        
+        this.getCardById("env_gold_red").moveTo(700, 120, true);
+        this.getCardById("road_red").moveTo(700, 220, true);
+        this.getCardById("env_wheat_red").moveTo(700, 320, true);
+        
+        this.getCardById("env_wood_red").moveTo(900, 120, true);
+        this.getCardById("village_red_2").moveTo(800, 220, true);
+        this.getCardById("env_sheep_red").moveTo(900, 320, true);
+
+        // --- BLACK SETUP
+        this.getCardById("env_coal_black").moveTo(500, 580, true);
+        this.getCardById("village_black_1").moveTo(600, 680, true);
+        this.getCardById("env_brick_black").moveTo(500, 780, true);
+        
+        this.getCardById("env_gold_black").moveTo(700, 580, true);
+        this.getCardById("road_black").moveTo(700, 680, true);
+        this.getCardById("env_wheat_black").moveTo(700, 780, true);
+        
+        this.getCardById("env_wood_black").moveTo(900, 580, true);
+        this.getCardById("village_black_2").moveTo(800, 680, true);
+        this.getCardById("env_sheep_black").moveTo(900, 780, true);
     }
 
     onPlayerButtonClick() {
@@ -424,6 +443,10 @@ class GameLoop {
     onDeckClick(deck) {
         console.log("deck clicked -> add card to player");
         deck.draw_card();
+    }
+
+    getCardById(id) {
+        return this.cards.filter(card => card.data.id == id)[0];
     }
 }
 
