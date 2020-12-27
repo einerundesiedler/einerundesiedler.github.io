@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/27/2020, 05:17:38";</script>
+<script>VERSION="12/27/2020, 05:20:43";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -58,18 +58,13 @@ class DB {
         
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+
+        this.example_get_data();
     }    
 
-    test() {
-        console.log("establish connection ...");
-
-        var refObj = document.getElementById("testobject");
-
-        const starCountRef = firebase.database().ref().child('testobject');
-        starCountRef.on('value', (snapshot) => {
-          const data = snapshot.val();
-          console.log(data);
-        });
+    example_get_data() {
+        const testRef = firebase.database().ref().child('testobject');
+        testRef.on('value', (snapshot) => console.log(snapshot.val()));
     }
 }
 
@@ -356,7 +351,6 @@ class GameLoop {
     onPlayerButtonClick() {
         this.playerID = this.playerID == 1 ? 2 : 1;
         this.scene.ui.btn_player.text = "player: " + this.playerID;
-        this.scene.db.test();
     }
 
     onDeckClick(deck) {
