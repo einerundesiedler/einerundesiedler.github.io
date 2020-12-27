@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 00:21:52";</script>
+<script>VERSION="12/28/2020, 00:47:43";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -97,7 +97,6 @@ class DB {
     
     // upload new card position to database
     set_deck_data(deck_index, cards) {
-        console.log(cards);
         this.refDecks.child(String(deck_index)).set(cards);
     }
 
@@ -146,6 +145,8 @@ class Card{
         // ui components
         this.image = scene.add.image(Card.start_x, Card.start_y, card_data.src).setInteractive();
         this.image.setScale(0.33);
+        
+        this.image.on('pointerdown', () => this.scene.main.onPointerDownCard(this)); 
 
         // parent view pointer for drag listener resolving 
         this.image.view = this; 
@@ -157,6 +158,12 @@ class Card{
             scene.input.on('drag',  (pointer, gameObject, dragX, dragY) => { gameObject.view.onDrag(dragX, dragY); });
             scene.input.on('dragend', (pointer, gameObject) => { gameObject.view.onDragEnd(); });
         }
+    }
+
+    resetPosition() {
+        this.image.x = Card.start_x;
+        this.image.y = Card.start_y;
+        this.sync();
     }
 
     moveTo(x, y, sync) {
@@ -211,6 +218,8 @@ class CardDeck {
         this.card_type = card_type;
         this.add_to_scene(scene, x, y);
         this.hover = false;
+
+        this.lastpointerdown = 0;
     }
 
     get card_back() {
@@ -237,7 +246,8 @@ class CardDeck {
 
         this.obj.setScale(0.5);
         
-        this.obj.on('pointerup', () => this.scene.main.onDeckClick(this)); 
+        this.obj.on('pointerdown', () => this.scene.main.onPointerDownDeck(this)); 
+        this.obj.on('pointerup', () => this.scene.main.onPointerUpDeck(this)); 
         this.obj.on('pointerover', () => this.onPointerOver()); 
         this.obj.on('pointerout', () => this.onPointerOut()); 
     }
@@ -280,13 +290,13 @@ class CardDeck {
         this.update();
     }
 
-    add_card(data) {
-        this.cards.push(data);
+    add_card(card_id) {
+        this.cards.push(card_id);
         this.sync();
     }
 
     remove_card(id) {
-        this.cards = this.cards.filter(card => card.id != id);
+        this.cards = this.cards.filter(card_id => card_id != id);
         this.sync();
     }
 
@@ -435,6 +445,9 @@ class GameLoop {
 
         this.cards = [];
         this.decks = [];
+
+        this.pointer_down_deck = undefined;
+        this.pointer_down_card = undefined;
     }
 
     onNewGameClick() {
@@ -474,9 +487,42 @@ class GameLoop {
         this.scene.ui.btn_player.text = "player: " + this.playerID;
     }
 
-    onDeckClick(deck) {
-        console.log("deck clicked -> add card to player");
-        deck.draw_card();
+    onPointerDownCard(card) {
+        this.pointer_down_card = card;
+        this.pointer_down_deck = undefined;
+    }
+
+    onPointerDownDeck(deck) {
+        this.pointer_down_card = undefined;
+        this.pointer_down_deck = deck;
+    }
+
+    onPointerUpDeck(deck) {
+        if (this.pointer_down_card != undefined) {
+            this.returnCardToDeck(this.pointer_down_card, deck);
+        } else if (this.pointer_down_deck != undefined) {
+            this.drawCardFromDeck(deck);
+        }
+
+        this.pointer_down_card = undefined;
+        this.pointer_down_deck = undefined;
+    }
+
+    returnCardToDeck(card, deck) {
+
+        if (card.data.type == deck.card_type) {
+            deck.add_card(card.index);
+            card.resetPosition();
+        }
+    }
+
+    drawCardFromDeck(deck) {
+        var card_id = deck.draw_card();
+
+        if (card_id != undefined) {
+            var card = this.cards.filter(card => card.index == card_id)[0];
+            card.moveTo(100, 100);
+        }
     }
 
     getCardById(id) {
