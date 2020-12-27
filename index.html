@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 00:18:32";</script>
+<script>VERSION="12/28/2020, 00:21:52";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -97,6 +97,7 @@ class DB {
     
     // upload new card position to database
     set_deck_data(deck_index, cards) {
+        console.log(cards);
         this.refDecks.child(String(deck_index)).set(cards);
     }
 
@@ -268,9 +269,14 @@ class CardDeck {
 
     // set either by array of cards or card_indices
     set_cards(cards) {
-        if (cards == null || cards.length == 0) { return }
+        if (cards == null) { return }
 
-        this.cards = cards[0].index == undefined ? cards : cards.map(card => card.index);
+        if (cards.length == 0) {
+            this.cards = [];
+        } else {
+            this.cards = cards[0].index == undefined ? cards : cards.map(card => card.index);
+        }
+
         this.update();
     }
 
