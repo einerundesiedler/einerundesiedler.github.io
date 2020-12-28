@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 21:39:05";</script>
+<script>VERSION="12/28/2020, 21:55:15";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -208,6 +208,14 @@ class Card{
     setScale(scale) {
         this.image.setScale(scale);
     }
+    
+    set interactive(val) {
+        if (val) {
+            this.image.setInteractive();
+        } else {
+            this.image.disableInteractive();
+        }
+    }
 
     onPointerDown() {
         this.scene.main.onPointerDownCard(this);
@@ -362,12 +370,26 @@ class CardDeck {
         return card;
     }
 
+    set interactive(val) {
+        if (val) {
+            this.obj.setInteractive();
+        } else {
+            this.obj.disableInteractive();
+        }
+    }
+
     show_cards() {
-        this.overlay = this.scene.add.graphics(0, 0);
+        this.scene.main.setBoardInteractive(false);
+
+        this.overlay = this.scene.add.graphics(0, 0).setInteractive();
         this.overlay.fillStyle(0x555555, 0.8);
         this.overlay.fillRect(0, 0, 1920, 1080);
 
         this.btn_close = new Button(this.scene, 65, 35, "close", () => this.hide_cards());
+        this.btn_shuffle = new Button(this.scene, 65, 850, "shuffle", () => {
+            this.hide_cards();
+            this.shuffle();
+        });
 
         this.cards_preview = []
         for(var i = 0; i < this.cards.length; i++) {
@@ -383,8 +405,10 @@ class CardDeck {
     }
 
     hide_cards() {
+        this.scene.main.setBoardInteractive(true);
         this.overlay.destroy();
         this.btn_close.destroy();
+        this.btn_shuffle.destroy();
         this.cards_preview.forEach(card => card.destroy());
     }
 
@@ -637,6 +661,12 @@ class GameLoop {
         this.pointer_down_deck_time = 0;
         this.pointer_down_card = undefined;
         this.pointer_down_deck = undefined;
+    }
+
+    setBoardInteractive(val) {
+        console.log("board do");
+        this.cards.forEach(card => card.interactive = val);
+        this.decks.forEach(deck => deck.interactive = val);
     }
 
     returnCardToDeck(card, deck) {
