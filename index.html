@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 21:55:15";</script>
+<script>VERSION="12/28/2020, 22:25:12";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -160,6 +160,9 @@ class Card{
         this.index = index;
         this.data = card_data;
         this.scene = scene;
+        this.onClick = undefined;
+
+        this.hover = false;
 
         // ui components
         this.image = scene.add.image(Card.start_x, Card.start_y, card_data.src).setInteractive();
@@ -167,7 +170,9 @@ class Card{
         
         this.pointerdowntime = 0;
         this.image.on('pointerdown', () => this.onPointerDown()); 
-        this.image.on('pointerup', () => this.onPointerUp()); 
+        this.image.on('pointerup', (pointer) => this.onPointerUp(pointer)); 
+        this.image.on('pointerover', () => this.onPointerOver()); 
+        this.image.on('pointerout', () => this.onPointerOut()); 
 
         // parent view pointer for drag listener resolving 
         this.image.view = this; 
@@ -178,6 +183,28 @@ class Card{
             Card.hasDragListener = true;
             scene.input.on('drag',  (pointer, gameObject, dragX, dragY) => { gameObject.view.onDrag(dragX, dragY); });
             scene.input.on('dragend', (pointer, gameObject) => { gameObject.view.onDragEnd(); });
+        }
+    }
+
+    setClickListener(callback) {
+        this.onClick = callback;
+    }
+    
+    onPointerOver() {
+        this.hover = true;
+        this.update();
+    }
+
+    onPointerOut() {
+        this.hover = false;
+        this.update();
+    }
+    
+    update() {
+        if (this.hover) {
+            this.image.setTint(0xbbbbbb);
+        } else {
+            this.image.clearTint();
         }
     }
 
@@ -222,9 +249,15 @@ class Card{
         this.pointerdowntime = Date.now();
     }
 
-    onPointerUp() {
+    onPointerUp(pointer) {
         if (Date.now() - this.pointerdowntime < 140) {
-            this.rotate(this.image.angle - 90, true);
+            if (this.onClick == undefined) {
+                var delta_angle = pointer.downX < this.image.x ? 90 : -90;
+
+                this.rotate(this.image.angle - delta_angle, true);
+            } else {
+                this.onClick(this);
+            }
         }
     }
 
@@ -381,7 +414,7 @@ class CardDeck {
     show_cards() {
         this.scene.main.setBoardInteractive(false);
 
-        this.overlay = this.scene.add.graphics(0, 0).setInteractive();
+        this.overlay = this.scene.add.graphics(0, 0)
         this.overlay.fillStyle(0x555555, 0.8);
         this.overlay.fillRect(0, 0, 1920, 1080);
 
@@ -397,9 +430,16 @@ class CardDeck {
             var y = 400 + Math.floor(i / 10) * 150;
 
             var data = this.scene.main.cards.filter(data => data.index == this.cards[i])[0].data;
-            var card = new Card(this.scene, data, this.index);
+            var card = new Card(this.scene, data, this.cards[i]);
             card.setScale(0.5);
             card.moveTo(x, y);
+
+            card.setClickListener(c => {
+                this.scene.main.selectCardFromDeck(this, c.index);
+                this.hide_cards();
+                this.show_cards();
+            });
+
             this.cards_preview.push(card);
         }
     }
@@ -514,8 +554,7 @@ function create ()
 
     // ------------------- UI ----------------
     this.ui = {};
-    this.ui.btn_newgame = new Button(this, 1700, 40, "new game", () => this.main.onNewGameClick());
-    this.ui.btn_player = new Button(this, 1850, 40, "join", () => this.main.onPlayerButtonClick());
+    this.ui.btn_newgame = new Button(this, 1800, 40, "new game", () => this.main.onNewGameClick());
     
     this.ui.player_overlay = [];
     
@@ -545,8 +584,9 @@ function create ()
     this.ui.dice_result = this.add.text(2, 450, 'P1: 6', { fontSize: '24px', fill: '#000' });
     this.ui.dice_time = this.add.text(2, 480, '12/2200/ 15:12', { fontSize: '12px', fill: '#000' });
 
-    
     this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
+
+    showChoosePlayerScreen(this);
 }
 
 function update ()
@@ -557,6 +597,31 @@ function update ()
 function render () 
 {
 
+}
+
+function showChoosePlayerScreen(scene) {
+    scene.main.setBoardInteractive(false);
+    var btn_papa = undefined;
+    var btn_jeri = undefined;
+    var overlay = scene.add.graphics(0, 0);
+    overlay.fillStyle(0x555555, 0.8);
+    overlay.fillRect(0, 0, 1920, 1080);
+
+    var hideScreen = () => {
+        scene.main.setBoardInteractive(true);
+        overlay.destroy();
+        btn_papa.destroy();
+        btn_jeri.destroy();
+    };
+
+    var btn_papa = new Button(scene, 600, 450, "Papa", () => {
+        scene.main.selectPlayer(1);
+        hideScreen();
+    });
+    var btn_jeri = new Button(scene, 800, 450, "Jeri", () => {
+        scene.main.selectPlayer(0);
+        hideScreen();
+    });
 }
 
 
@@ -611,10 +676,8 @@ class GameLoop {
         this.getCardById("env_sheep_black").moveTo(900, 780, true);
     }
 
-    onPlayerButtonClick() {
-        this.playerID = this.playerID == 0 ? 1 : 0;
-        this.scene.ui.btn_player.text = this.playerNames[this.playerID];
-
+    selectPlayer(playerID) {
+        this.playerID = playerID;
         this.scene.ui.player_overlay[(this.playerID+1) % 2].visible = true;
         this.scene.ui.player_overlay[(this.playerID) % 2].visible = false;
     }
@@ -664,7 +727,6 @@ class GameLoop {
     }
 
     setBoardInteractive(val) {
-        console.log("board do");
         this.cards.forEach(card => card.interactive = val);
         this.decks.forEach(deck => deck.interactive = val);
     }
@@ -677,9 +739,16 @@ class GameLoop {
         }
     }
 
-    drawCardFromDeck(deck) {
-        var card_id = deck.draw_card();
+    selectCardFromDeck(deck, card_id) {
+        deck.remove_card(card_id);
+        this.addCardToPlayerHand(card_id);
+    }
 
+    drawCardFromDeck(deck) {
+        this.addCardToPlayerHand(deck.draw_card());
+    }
+
+    addCardToPlayerHand(card_id) {
         if (card_id != undefined) {
             var card = this.cards.filter(card => card.index == card_id)[0];
             var y = 50 + this.playerID * 550;
