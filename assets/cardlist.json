@@ -10,34 +10,34 @@
 
     "cards": [ 
 
-        { "id":"env_sheep_red", "type":"RED", "src":"wool.png"},
-        { "id":"env_sheep_black", "type":"BLACK", "src":"wool.png"},
-        { "id":"env_sheep_1", "type":"ENVIRONMENT", "src":"wool.png"},
-        { "id":"env_sheep_2", "type":"ENVIRONMENT", "src":"wool.png"},
+        { "id":"env_sheep_red", "type":"RED", "src":"env_wool_3.png"},
+        { "id":"env_sheep_black", "type":"BLACK", "src":"env_wool_4.png"},
+        { "id":"env_sheep_1", "type":"ENVIRONMENT", "src":"env_wool_5.png"},
+        { "id":"env_sheep_2", "type":"ENVIRONMENT", "src":"env_wool_6.png"},
         
-        { "id":"env_coal_red", "type":"RED", "src":"coal.png"},
-        { "id":"env_coal_black", "type":"BLACK", "src":"coal.png"},
-        { "id":"env_coal_1", "type":"ENVIRONMENT", "src":"coal.png"},
-        { "id":"env_coal_2", "type":"ENVIRONMENT", "src":"coal.png"},
+        { "id":"env_coal_red", "type":"RED", "src":"env_coal_2.png"},
+        { "id":"env_coal_black", "type":"BLACK", "src":"env_coal_3.png"},
+        { "id":"env_coal_1", "type":"ENVIRONMENT", "src":"env_coal_4.png"},
+        { "id":"env_coal_2", "type":"ENVIRONMENT", "src":"env_coal_5.png"},
 
-        { "id":"env_wood_red", "type":"RED", "src":"wood.png"},
-        { "id":"env_wood_black", "type":"BLACK", "src":"wood.png"},
-        { "id":"env_wood_1", "type":"ENVIRONMENT", "src":"wood.png"},
-        { "id":"env_wood_2", "type":"ENVIRONMENT", "src":"wood.png"},
+        { "id":"env_wood_red", "type":"RED", "src":"env_wood_4.png"},
+        { "id":"env_wood_black", "type":"BLACK", "src":"env_wood_5.png"},
+        { "id":"env_wood_1", "type":"ENVIRONMENT", "src":"env_wood_6.png"},
+        { "id":"env_wood_2", "type":"ENVIRONMENT", "src":"env_wood_1.png"},
 
-        { "id":"env_wheat_red", "type":"RED", "src":"wheat.png"},
-        { "id":"env_wheat_black", "type":"BLACK", "src":"wheat.png"},
-        { "id":"env_wheat_1", "type":"ENVIRONMENT", "src":"wheat.png"},
-        { "id":"env_wheat_2", "type":"ENVIRONMENT", "src":"wheat.png"},
+        { "id":"env_wheat_red", "type":"RED", "src":"env_wheat_1.png"},
+        { "id":"env_wheat_black", "type":"BLACK", "src":"env_wheat_2.png"},
+        { "id":"env_wheat_1", "type":"ENVIRONMENT", "src":"env_wheat_3.png"},
+        { "id":"env_wheat_2", "type":"ENVIRONMENT", "src":"env_wheat_4.png"},
 
-        { "id":"env_brick_red", "type":"RED", "src":"brick.png"},
-        { "id":"env_brick_black", "type":"BLACK", "src":"brick.png"},
-        { "id":"env_brick_1", "type":"ENVIRONMENT", "src":"brick.png"},
-        { "id":"env_brick_2", "type":"ENVIRONMENT", "src":"brick.png"},
+        { "id":"env_brick_red", "type":"RED", "src":"env_brick_5.png"},
+        { "id":"env_brick_black", "type":"BLACK", "src":"env_brick_6.png"},
+        { "id":"env_brick_1", "type":"ENVIRONMENT", "src":"env_brick_1.png"},
+        { "id":"env_brick_2", "type":"ENVIRONMENT", "src":"env_brick_2.png"},
         
-        { "id":"env_gold_red", "type":"RED", "src":"gold.png"},
-        { "id":"env_gold_black", "type":"BLACK", "src":"gold.png"},
-        { "id":"env_gold_1", "type":"ENVIRONMENT", "src":"gold.png"},
+        { "id":"env_gold_red", "type":"RED", "src":"env_gold_6.png"},
+        { "id":"env_gold_black", "type":"BLACK", "src":"env_gold_1.png"},
+        { "id":"env_gold_1", "type":"ENVIRONMENT", "src":"env_gold_3.png"},
 
 
         { "id":"road_red", "type":"RED", "src":"road.png"},
@@ -68,8 +68,19 @@
         { "id":"city_5", "type":"CITY", "src":"city.png"},
         { "id":"city_6", "type":"CITY", "src":"city.png"},
         { "id":"city_7", "type":"CITY", "src":"city.png"},
+        
 
-        { "id":"event_1", "type":"EVENT",  "src":"city.png" },
+        {"id":"event_baumeister", "type":"EVENT", "src":"event_baumeister.png"},
+        {"id":"event_burgerkrieg", "type":"EVENT", "src":"event_burgerkrieg.png"},
+        {"id":"event_ertragreichesjahr", "type":"EVENT", "src":"event_ertragreichesjahr.png"},
+        {"id":"event_ertragreichesjahr", "type":"EVENT", "src":"event_ertragreichesjahr.png"},
+        {"id":"event_fortschritt", "type":"EVENT", "src":"event_fortschritt.png"},
+        {"id":"event_fortschritt", "type":"EVENT", "src":"event_fortschritt.png"},
+        {"id":"event_jahreswechsel", "type":"EVENT", "src":"event_jahreswechsel.png"},
+        {"id":"event_konflikt", "type":"EVENT", "src":"event_konflikt.png"},
+        {"id":"event_seuche", "type":"EVENT", "src":"event_seuche.png"},
+        {"id":"event_seuche", "type":"EVENT", "src":"event_seuche.png"},
+
         
         
         {"id":"ext_lager_1", "type":"EXTENSION", "src":"ext_lager.png"},

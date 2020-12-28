@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 21:12:19";</script>
+<script>VERSION="12/28/2020, 21:39:05";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -216,7 +216,7 @@ class Card{
 
     onPointerUp() {
         if (Date.now() - this.pointerdowntime < 140) {
-            this.rotate(this.image.angle + 90, true);
+            this.rotate(this.image.angle - 90, true);
         }
     }
 
@@ -558,6 +558,7 @@ class GameLoop {
         // create card data from 
         reset_decks(this.decks, this.cards);
         this.scene.db.reset_card_positions(this.cards);
+        this.scene.db.set_dice_data(0,0,0);
 
         // --- RED SETUP
         this.getCardById("env_coal_red").moveTo(500, 120, true);
