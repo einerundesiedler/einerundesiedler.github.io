@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 04:11:18";</script>
+<script>VERSION="12/28/2020, 04:17:46";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -193,7 +193,7 @@ class Card{
     }
 
     onPointerUp() {
-        if (Date.now() - this.pointerdowntime < 250) {
+        if (Date.now() - this.pointerdowntime < 140) {
             this.rotate(this.image.angle + 90, true);
         }
     }
