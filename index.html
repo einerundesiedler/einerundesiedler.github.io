@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 22:58:40";</script>
+<script>VERSION="12/28/2020, 23:03:44";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -696,7 +696,7 @@ class GameLoop {
     onDiceData(player_id, roll, timestamp) {
         this.scene.ui.dice_result.text = "";
         setTimeout(() => { 
-            this.scene.ui.dice_result.text = this.playerNames[this.playerID] + ": " + roll;
+            this.scene.ui.dice_result.text = this.playerNames[player_id] + ": " + roll;
         }, 2000);
 
         this.scene.ui.dice_time.text = new Date(timestamp).toUTCString().substr(17, 8);
