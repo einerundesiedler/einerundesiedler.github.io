@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 23:05:27";</script>
+<script>VERSION="12/28/2020, 23:12:11";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -435,12 +435,12 @@ class CardDeck {
             var y = 400 + Math.floor(i / 10) * 150;
 
             var data = this.scene.main.cards.filter(data => data.index == this.cards[i])[0].data;
-            var card = new Card(this.scene, data, this.cards[i]);
+            var card = new Card(this.scene, data, -1);
             card.setScale(0.5);
             card.moveTo(x, y);
 
             card.setClickListener(c => {
-                this.scene.main.selectCardFromDeck(this, c.index);
+                this.scene.main.selectCardFromDeck(this, this.cards[i]);
                 this.hide_cards();
                 this.show_cards();
             });
