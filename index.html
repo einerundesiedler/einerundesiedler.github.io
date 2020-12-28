@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 00:51:27";</script>
+<script>VERSION="12/28/2020, 01:04:12";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -71,7 +71,8 @@ class DB {
         for (var i = 0; i < cards.length; i++) {
             data[String(i)] = {
                 x: Card.start_x,
-                y: Card.start_y
+                y: Card.start_y,
+                r: 0
             };
         }
         
@@ -80,8 +81,8 @@ class DB {
     }
     
     // upload new card position to database
-    set_card_position(card_index, x, y) {
-        this.refCards.child(String(card_index)).set({x: x, y:y});
+    set_card_position(card_index, x, y, angle) {
+        this.refCards.child(String(card_index)).set({x: x, y:y, r:angle});
     }
 
     // creates individual listener for each card position
@@ -89,7 +90,7 @@ class DB {
         gameLoop.cards.forEach(card => {
             this.refCards.child(String(card.index)).on('value', (snapshot) => {
                 var pos = snapshot.val();
-                gameLoop.cards[card.index].on_pos_update_in_database(pos.x, pos.y);
+                gameLoop.cards[card.index].on_pos_update_in_database(pos.x, pos.y, pos.r);
             });
         });
     }
@@ -146,7 +147,9 @@ class Card{
         this.image = scene.add.image(Card.start_x, Card.start_y, card_data.src).setInteractive();
         this.image.setScale(0.33);
         
-        this.image.on('pointerdown', () => this.scene.main.onPointerDownCard(this)); 
+        this.pointerdowntime = 0;
+        this.image.on('pointerdown', () => this.onPointerDown()); 
+        this.image.on('pointerup', () => this.onPointerUp()); 
 
         // parent view pointer for drag listener resolving 
         this.image.view = this; 
@@ -175,6 +178,25 @@ class Card{
         }
     }
 
+    rotate(angle, sync) {
+        this.image.angle = angle;
+        
+        if (sync == true) {
+            this.sync();
+        }
+    }
+
+    onPointerDown() {
+        this.scene.main.onPointerDownCard(this);
+        this.pointerdowntime = Date.now();
+    }
+
+    onPointerUp() {
+        if (Date.now() - this.pointerdowntime < 250) {
+            this.rotate(this.image.angle + 90, true);
+        }
+    }
+
     onDrag(dragX, dragY) {
         this.moveTo(dragX, dragY);
     }
@@ -184,11 +206,12 @@ class Card{
     }
 
     sync() {
-        this.scene.db.set_card_position(this.index, this.image.x, this.image.y);
+        this.scene.db.set_card_position(this.index, this.image.x, this.image.y, this.image.angle);
     }
 
-    on_pos_update_in_database(x, y) {
+    on_pos_update_in_database(x, y, angle) {
         this.moveTo(x, y);
+        this.rotate(angle);
     }
 }
 
