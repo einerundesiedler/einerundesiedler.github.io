@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 23:12:11";</script>
+<script>VERSION="12/28/2020, 23:12:32";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -254,7 +254,7 @@ class Card{
     }
 
     onPointerUp(pointer) {
-        if (Date.now() - this.pointerdowntime < 140) {
+        if (Date.now() - this.pointerdowntime < 250) {
             if (this.onClick == undefined) {
                 var delta_angle = pointer.downX < this.image.x ? 90 : -90;
 
