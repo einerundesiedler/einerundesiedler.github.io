@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 22:25:12";</script>
+<script>VERSION="12/28/2020, 22:30:09";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -167,7 +167,10 @@ class Card{
         // ui components
         this.image = scene.add.image(Card.start_x, Card.start_y, card_data.src).setInteractive();
         this.setScale(0.33);
-        
+
+        this.preview = scene.add.image(1750, 450, card_data.src);
+        this.preview.visible = false;
+
         this.pointerdowntime = 0;
         this.image.on('pointerdown', () => this.onPointerDown()); 
         this.image.on('pointerup', (pointer) => this.onPointerUp(pointer)); 
@@ -201,6 +204,7 @@ class Card{
     }
     
     update() {
+        this.preview.visible = this.hover;
         if (this.hover) {
             this.image.setTint(0xbbbbbb);
         } else {
