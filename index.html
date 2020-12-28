@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 01:04:12";</script>
+<script>VERSION="12/28/2020, 01:05:55";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -166,6 +166,7 @@ class Card{
     resetPosition() {
         this.image.x = Card.start_x;
         this.image.y = Card.start_y;
+        this.image.angle = 0;
         this.sync();
     }
 
