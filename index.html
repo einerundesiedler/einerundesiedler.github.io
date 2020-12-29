@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/28/2020, 23:27:44";</script>
+<script>VERSION="12/29/2020, 18:00:32";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -700,6 +700,10 @@ class GameLoop {
         }, 2000);
 
         this.scene.ui.dice_time.text = new Date(timestamp).toUTCString().substr(17, 8);
+
+        var event_dice_roll = timestamp % 6;
+        var events = ["Fragezeichen", "Fragezeichen", "Ritter", "Händler", "Sonne", "Keule"];
+        this.scene.ui.dice_time.text = events[event_dice_roll];
     }
 
     onPointerDownCard(card) {
