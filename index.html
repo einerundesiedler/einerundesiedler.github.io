@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="12/29/2020, 18:00:32";</script>
+<script>VERSION="01/14/2021, 15:12:04";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -359,7 +359,7 @@ class CardDeck {
     }
 
     update() {
-        if (this.hover) {
+        if (this.hover || this.num_cards == 0) {
             this.obj.setTint(0x555555);
         } else {
             this.obj.clearTint();
