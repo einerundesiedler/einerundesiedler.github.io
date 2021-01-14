@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="01/14/2021, 15:12:04";</script>
+<script>VERSION="01/14/2021, 15:58:04";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -518,8 +518,8 @@ var config = {
     scene: {
         preload: preload,
         create: create,
-        update: update,
-        render: render
+        update: update
+        //render: render
     }
 };
 
@@ -591,10 +591,12 @@ function create ()
     this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
 
     showChoosePlayerScreen(this);
+
 }
 
 function update ()
 {
+    
 }
 
 
@@ -671,13 +673,13 @@ class GameLoop {
         this.getCardById("village_black_1").moveTo(600, 680, true);
         this.getCardById("env_brick_black").moveTo(500, 780, true);
         
-        this.getCardById("env_gold_black").moveTo(700, 580, true);
+        this.getCardById("env_wheat_black").moveTo(700, 580, true);
         this.getCardById("road_black").moveTo(700, 680, true);
-        this.getCardById("env_wheat_black").moveTo(700, 780, true);
+        this.getCardById("env_wood_black").moveTo(700, 780, true);
         
-        this.getCardById("env_wood_black").moveTo(900, 580, true);
+        this.getCardById("env_sheep_black").moveTo(900, 580, true);
         this.getCardById("village_black_2").moveTo(800, 680, true);
-        this.getCardById("env_sheep_black").moveTo(900, 780, true);
+        this.getCardById("env_gold_black").moveTo(900, 780, true);
     }
 
     selectPlayer(playerID) {
