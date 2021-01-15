@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="01/15/2021, 20:15:50";</script>
+<script>VERSION="01/15/2021, 20:23:04";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -439,6 +439,10 @@ class CardDeck {
         this.sync();
     }
 
+    peek() {
+        return this.cards[0];
+    }
+
     draw_card() {
         var card = this.cards.shift();
         this.update();
@@ -739,7 +743,11 @@ class GameLoop {
     }
 
     onDiceData(player_id, roll, timestamp) {
-        var did_roll = this.playerId == player_id;
+        var did_roll = false;
+        if (player_id == this.playerID) {
+            did_roll = true;
+        }
+        console.log(Number(player_id), Number(this.playerID), did_roll);
 
         this.scene.ui.dice_result.text = "";
         setTimeout(() => { 
@@ -754,7 +762,7 @@ class GameLoop {
         this.scene.ui.dice_time.text = event;
 
         if (event == "Fragezeichen" && this.decks.length > 0 && this.decks[0].num_cards > 0) {
-            var event_card_id = this.decks[0].cards[0]();
+            var event_card_id = this.decks[0].peek();
             this.scene.ui.event_overlay.displayEvent(this.cards[event_card_id], did_roll);
 
             if (did_roll) {
