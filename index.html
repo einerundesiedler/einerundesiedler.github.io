@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="01/14/2021, 15:58:04";</script>
+<script>VERSION="01/15/2021, 20:10:59";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -144,6 +144,46 @@ class Button {
     destroy() {
         this.bg.destroy();
         this.textfield.destroy();
+    }
+}
+
+
+class EventOverlay {
+    constructor(scene) {
+        this.scene = scene;
+        this.bg = scene.add.graphics(0,0);
+        this.bg.fillStyle(0x555555, 0.8);
+        this.bg.fillRect(0, 0, 1920, 1080);
+
+        this.hide();
+    }
+
+    displayEvent(event_card) {
+        this.bg.visible = true;
+        this.btn_close = new Button(this.scene, 900, 800, "close", () => { 
+            if (event_card.data.id == "event_jahreswechsel") {
+                this.scene.main.decks[0].shuffle();
+            }
+            this.hide()
+        });
+
+        this.card = this.scene.add.image(900, 430, event_card.data.src);
+        this.card.setScale(1.5);
+
+    }
+
+
+    hide() {
+        this.bg.visible = false;
+
+        if (this.card != undefined) {
+            this.card.destroy();
+        }
+
+        if (this.btn_close != undefined) {
+            this.btn_close.destroy();
+            this.btn_close = undefined;
+        }
     }
 }
 </script>
@@ -508,7 +548,8 @@ function reset_decks(decks, cards) {
 }
 </script>
 <script>
-ASSET_PATH = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/";
+ASSET_PATH = !RELEASE ? "assets/" : "https://raw.githubusercontent.com/einerundesiedler/einerundesiedler.github.io/master/assets/"
+
 
 var config = {
     type: Phaser.AUTO,
@@ -518,8 +559,8 @@ var config = {
     scene: {
         preload: preload,
         create: create,
-        update: update
-        //render: render
+        update: update,
+        render: render
     }
 };
 
@@ -578,7 +619,7 @@ function create ()
         border.lineTo(x, y);
         border.strokePath();
 
-
+        // TODO : replace with interactive to avoid mouse over card steal
         this.ui.player_overlay.push(this.add.graphics(0, 0));
         this.ui.player_overlay[i].fillStyle(0x555555, 1.0);
         this.ui.player_overlay[i].fillRect(x, y, w, h);
@@ -590,8 +631,8 @@ function create ()
 
     this.add.text(2, 2, 'version: ' + VERSION, { fontSize: '12px', fill: '#000' });
 
+    this.ui.event_overlay = new EventOverlay(this);
     showChoosePlayerScreen(this);
-
 }
 
 function update ()
@@ -629,8 +670,6 @@ function showChoosePlayerScreen(scene) {
         hideScreen();
     });
 }
-
-
 
 
 class GameLoop {
@@ -705,7 +744,14 @@ class GameLoop {
 
         var event_dice_roll = timestamp % 6;
         var events = ["Fragezeichen", "Fragezeichen", "Ritter", "Händler", "Sonne", "Keule"];
-        this.scene.ui.dice_time.text = events[event_dice_roll];
+        var event = events[event_dice_roll];
+        this.scene.ui.dice_time.text = event;
+
+        if (event == "Fragezeichen" && this.decks.length > 0 && this.decks[0].num_cards > 0) {
+            var event_card_id = this.decks[0].draw_card();
+            this.scene.ui.event_overlay.displayEvent(this.cards[event_card_id]);
+            this.decks[0].add_card(event_card_id);
+        }
     }
 
     onPointerDownCard(card) {
