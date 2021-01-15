@@ -16,7 +16,7 @@
 </head>
 <body>
 <script>RELEASE=true;</script>
-<script>VERSION="01/15/2021, 20:10:59";</script>
+<script>VERSION="01/15/2021, 20:15:50";</script>
 
 <script>
 function array_remove_duplicates(value, index, self) {
@@ -158,10 +158,10 @@ class EventOverlay {
         this.hide();
     }
 
-    displayEvent(event_card) {
+    displayEvent(event_card, did_roll) {
         this.bg.visible = true;
         this.btn_close = new Button(this.scene, 900, 800, "close", () => { 
-            if (event_card.data.id == "event_jahreswechsel") {
+            if (event_card.data.id == "event_jahreswechsel" && did_roll) {
                 this.scene.main.decks[0].shuffle();
             }
             this.hide()
@@ -529,6 +529,10 @@ function create_decks(scene) {
     scene.db.link_decks(scene.main);
 }
 
+function reset_event_deck(decks, cards) {
+    decks[0].set_cards(cards.filter(card => card.data.type == "EVENT"));
+}
+
 function reset_decks(decks, cards) {
     decks[0].set_cards(cards.filter(card => card.data.type == "EVENT"));
     decks[1].set_cards(cards.filter(card => card.data.type == "CITY"));
@@ -735,6 +739,8 @@ class GameLoop {
     }
 
     onDiceData(player_id, roll, timestamp) {
+        var did_roll = this.playerId == player_id;
+
         this.scene.ui.dice_result.text = "";
         setTimeout(() => { 
             this.scene.ui.dice_result.text = this.playerNames[player_id] + ": " + roll;
@@ -748,9 +754,12 @@ class GameLoop {
         this.scene.ui.dice_time.text = event;
 
         if (event == "Fragezeichen" && this.decks.length > 0 && this.decks[0].num_cards > 0) {
-            var event_card_id = this.decks[0].draw_card();
-            this.scene.ui.event_overlay.displayEvent(this.cards[event_card_id]);
-            this.decks[0].add_card(event_card_id);
+            var event_card_id = this.decks[0].cards[0]();
+            this.scene.ui.event_overlay.displayEvent(this.cards[event_card_id], did_roll);
+
+            if (did_roll) {
+                this.decks[0].add_card(this.decks[0].draw_card());
+            }
         }
     }
 
